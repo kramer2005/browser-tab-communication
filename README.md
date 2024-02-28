@@ -15,7 +15,7 @@
 
 This project aims to utilize WebRTC for browser tab communication. The main objective is to have real time updates working with multiple tabs and windows.
 
-You can see a live example [here](https://kramerdev.github.io/browser-tab-communication).
+You can see a live example [here](https://kramer2005.github.io/browser-tab-communication/).
 
 ### Communication
 
