@@ -4,6 +4,7 @@ src
 .gitignore
 .nvmrc
 .prettierrc
-README.md
 tsconfig.json
 webpack.config.js
+dist/bundle.js
+connection.webp

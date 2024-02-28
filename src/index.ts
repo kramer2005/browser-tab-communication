@@ -1,3 +1,6 @@
+import BrowserTab from './lib/BrowserTab'
 import TabsManager from './lib/TabsManager'
 
-export default TabsManager.getInstance()
+const tabsManager = TabsManager.getInstance()
+
+export { BrowserTab, tabsManager as TabsManager }

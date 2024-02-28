@@ -4,8 +4,8 @@ import { v4 as uuid } from 'uuid'
 
 class TabsManager {
   static instance: TabsManager
-  private broadcast: BroadcastChannel
-  private tabs: BrowserTab[] = []
+  private broadcastChannel: BroadcastChannel
+  private _tabs: BrowserTab[] = []
   private id = uuid()
 
   static getInstance(broadcastChannelName?: string) {
@@ -16,11 +16,11 @@ class TabsManager {
   }
 
   private constructor(broadcastChannelName?: string) {
-    this.broadcast = new BroadcastChannel(
+    this.broadcastChannel = new BroadcastChannel(
       broadcastChannelName || `tab-communication-${window.location.hostname}`,
     )
 
-    this.broadcast.onmessage = (event: TabCommEvent) => {
+    this.broadcastChannel.onmessage = (event: TabCommEvent) => {
       const { data } = event
 
       switch (data.type) {
@@ -43,14 +43,14 @@ class TabsManager {
     }
 
     window.addEventListener('load', () => {
-      this.broadcast.postMessage(<Sync>{
+      this.broadcastChannel.postMessage(<Sync>{
         type: 'sync',
         clientId: this.id,
       })
     })
 
     window.addEventListener('beforeunload', () => {
-      this.broadcast.postMessage(<Close>{
+      this.broadcastChannel.postMessage(<Close>{
         type: 'close',
         clientId: this.id,
       })
@@ -66,7 +66,7 @@ class TabsManager {
     dataChannel.onopen = () => this.onTabOpen?.(currentTab)
 
     const offer = await pc.createOffer()
-    this.broadcast.postMessage(<Offer>{
+    this.broadcastChannel.postMessage(<Offer>{
       type: 'offer',
       sdp: offer.sdp,
       dealerId: this.id,
@@ -90,7 +90,7 @@ class TabsManager {
 
     const answer = await pc.createAnswer()
     await pc.setLocalDescription(answer)
-    this.broadcast.postMessage(<Answer>{
+    this.broadcastChannel.postMessage(<Answer>{
       type: 'answer',
       sdp: answer.sdp,
       dealerId: offer.dealerId,
@@ -101,7 +101,7 @@ class TabsManager {
   private async handleAnswer(event: Answer) {
     if (event.dealerId !== this.id) return
 
-    this.tabs
+    this._tabs
       .find((tab) => tab.id === event.clientId)
       ?.peerConnection.setRemoteDescription(event)
   }
@@ -110,17 +110,17 @@ class TabsManager {
     if (candidate.candidate) {
       if (candidate.clientId !== this.id) return
 
-      this.tabs
+      this._tabs
         .find((tab) => tab.id === candidate.dealerId)
         ?.peerConnection.addIceCandidate(candidate)
     }
   }
 
   private handleClosing(closingTab: Close) {
-    const tab = this.tabs.find((tab) => tab.id === closingTab.clientId)
+    const tab = this._tabs.find((tab) => tab.id === closingTab.clientId)
 
     if (tab) {
-      this.tabs = this.tabs.filter((t) => t !== tab)
+      this._tabs = this._tabs.filter((t) => t !== tab)
       this.onTabClose?.(tab)
       tab.peerConnection.close()
     }
@@ -130,7 +130,7 @@ class TabsManager {
     const pc = new RTCPeerConnection()
     pc.onicecandidate = (e) => {
       if (e.candidate) {
-        this.broadcast.postMessage({
+        this.broadcastChannel.postMessage({
           type: 'candidate',
           candidate: e.candidate.candidate,
           sdpMid: e.candidate.sdpMid,
@@ -147,25 +147,25 @@ class TabsManager {
         pc.connectionState !== 'connected' &&
         pc.connectionState !== 'connecting'
       ) {
-        this.tabs = this.tabs.filter((tab) => tab !== newTab)
+        this._tabs = this._tabs.filter((tab) => tab !== newTab)
         this.onTabClose?.(newTab)
 
         pc.close()
       }
     }
-    this.tabs.push(newTab)
+    this._tabs.push(newTab)
 
     return newTab
   }
 
-  get openTabs() {
-    return this.tabs.filter((tab) => tab.dataChannel.readyState === 'open')
+  get tabs() {
+    return this._tabs.filter((tab) => tab.dataChannel.readyState === 'open')
   }
 
   onTabOpen: (tab: BrowserTab) => void
   onTabClose: (tab: BrowserTab) => void
-  broadcastMessage<T>(data: T) {
-    this.openTabs.forEach((tab) => tab.send(data))
+  broadcast<T>(data: T) {
+    this.tabs.forEach((tab) => tab.send(data))
   }
 }
 
