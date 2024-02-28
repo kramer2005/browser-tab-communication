@@ -1,0 +1,45 @@
+{
+  "name": "@kramerdev/browser-tab-communication",
+  "version": "1.0.0",
+  "description": "A simple library for communicating between browser tabs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kramer2005/browser-tab-communication.git"
+  },
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "webrtc",
+    "browser tab",
+    "tab",
+    "tab communication",
+    "tab connection"
+  ],
+  "author": "Wagner Kramer <wagner@kramer.dev.br>",
+  "bugs": {
+    "url": "https://github.com/kramer2005/browser-tab-communication/issues"
+  },
+  "peerDependencies": {
+    "uuid": "^9.0.1"
+  },
+  "dependencies": {
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/uuid": "^9.0.8",
+    "@typescript-eslint/eslint-plugin": "^7.1.0",
+    "@typescript-eslint/parser": "^7.1.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "prettier": "^3.2.5",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.3",
+    "webpack": "^5.90.3",
+    "webpack-cli": "^5.1.4"
+  }
+}
