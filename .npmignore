@@ -8,3 +8,4 @@ tsconfig.json
 webpack.config.js
 dist/bundle.js
 connection.webp
+index.html

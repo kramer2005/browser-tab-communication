@@ -1,8 +1,8 @@
 import BrowserTab from './BrowserTab';
 declare class TabsManager {
     static instance: TabsManager;
-    private broadcast;
-    private tabs;
+    private broadcastChannel;
+    private _tabs;
     private id;
     static getInstance(broadcastChannelName?: string): TabsManager;
     private constructor();
@@ -12,9 +12,9 @@ declare class TabsManager {
     private handleCandidate;
     private handleClosing;
     private createTab;
-    get openTabs(): BrowserTab[];
+    get tabs(): BrowserTab[];
     onTabOpen: (tab: BrowserTab) => void;
     onTabClose: (tab: BrowserTab) => void;
-    broadcastMessage<T>(data: T): void;
+    broadcast<T>(data: T): void;
 }
 export default TabsManager;

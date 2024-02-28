@@ -17,10 +17,10 @@ class TabsManager {
         return TabsManager.instance;
     }
     constructor(broadcastChannelName) {
-        this.tabs = [];
+        this._tabs = [];
         this.id = uuid();
-        this.broadcast = new BroadcastChannel(broadcastChannelName || `tab-communication-${window.location.hostname}`);
-        this.broadcast.onmessage = (event) => {
+        this.broadcastChannel = new BroadcastChannel(broadcastChannelName || `tab-communication-${window.location.hostname}`);
+        this.broadcastChannel.onmessage = (event) => {
             const { data } = event;
             switch (data.type) {
                 case 'sync':
@@ -41,13 +41,13 @@ class TabsManager {
             }
         };
         window.addEventListener('load', () => {
-            this.broadcast.postMessage({
+            this.broadcastChannel.postMessage({
                 type: 'sync',
                 clientId: this.id,
             });
         });
         window.addEventListener('beforeunload', () => {
-            this.broadcast.postMessage({
+            this.broadcastChannel.postMessage({
                 type: 'close',
                 clientId: this.id,
             });
@@ -61,7 +61,7 @@ class TabsManager {
             currentTab.dataChannel = dataChannel;
             dataChannel.onopen = () => { var _a; return (_a = this.onTabOpen) === null || _a === void 0 ? void 0 : _a.call(this, currentTab); };
             const offer = yield pc.createOffer();
-            this.broadcast.postMessage({
+            this.broadcastChannel.postMessage({
                 type: 'offer',
                 sdp: offer.sdp,
                 dealerId: this.id,
@@ -83,7 +83,7 @@ class TabsManager {
             yield pc.setRemoteDescription(offer);
             const answer = yield pc.createAnswer();
             yield pc.setLocalDescription(answer);
-            this.broadcast.postMessage({
+            this.broadcastChannel.postMessage({
                 type: 'answer',
                 sdp: answer.sdp,
                 dealerId: offer.dealerId,
@@ -96,7 +96,7 @@ class TabsManager {
         return __awaiter(this, void 0, void 0, function* () {
             if (event.dealerId !== this.id)
                 return;
-            (_a = this.tabs
+            (_a = this._tabs
                 .find((tab) => tab.id === event.clientId)) === null || _a === void 0 ? void 0 : _a.peerConnection.setRemoteDescription(event);
         });
     }
@@ -105,15 +105,15 @@ class TabsManager {
         if (candidate.candidate) {
             if (candidate.clientId !== this.id)
                 return;
-            (_a = this.tabs
+            (_a = this._tabs
                 .find((tab) => tab.id === candidate.dealerId)) === null || _a === void 0 ? void 0 : _a.peerConnection.addIceCandidate(candidate);
         }
     }
     handleClosing(closingTab) {
         var _a;
-        const tab = this.tabs.find((tab) => tab.id === closingTab.clientId);
+        const tab = this._tabs.find((tab) => tab.id === closingTab.clientId);
         if (tab) {
-            this.tabs = this.tabs.filter((t) => t !== tab);
+            this._tabs = this._tabs.filter((t) => t !== tab);
             (_a = this.onTabClose) === null || _a === void 0 ? void 0 : _a.call(this, tab);
             tab.peerConnection.close();
         }
@@ -122,7 +122,7 @@ class TabsManager {
         const pc = new RTCPeerConnection();
         pc.onicecandidate = (e) => {
             if (e.candidate) {
-                this.broadcast.postMessage({
+                this.broadcastChannel.postMessage({
                     type: 'candidate',
                     candidate: e.candidate.candidate,
                     sdpMid: e.candidate.sdpMid,
@@ -137,19 +137,19 @@ class TabsManager {
             var _a;
             if (pc.connectionState !== 'connected' &&
                 pc.connectionState !== 'connecting') {
-                this.tabs = this.tabs.filter((tab) => tab !== newTab);
+                this._tabs = this._tabs.filter((tab) => tab !== newTab);
                 (_a = this.onTabClose) === null || _a === void 0 ? void 0 : _a.call(this, newTab);
                 pc.close();
             }
         };
-        this.tabs.push(newTab);
+        this._tabs.push(newTab);
         return newTab;
     }
-    get openTabs() {
-        return this.tabs.filter((tab) => tab.dataChannel.readyState === 'open');
+    get tabs() {
+        return this._tabs.filter((tab) => tab.dataChannel.readyState === 'open');
     }
-    broadcastMessage(data) {
-        this.openTabs.forEach((tab) => tab.send(data));
+    broadcast(data) {
+        this.tabs.forEach((tab) => tab.send(data));
     }
 }
 export default TabsManager;

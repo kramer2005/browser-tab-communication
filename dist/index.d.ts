@@ -1,3 +1,4 @@
+import BrowserTab from './lib/BrowserTab';
 import TabsManager from './lib/TabsManager';
-declare const _default: TabsManager;
-export default _default;
+declare const tabsManager: TabsManager;
+export { BrowserTab, tabsManager as TabsManager };
