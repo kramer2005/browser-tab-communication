@@ -23,6 +23,10 @@
   "bugs": {
     "url": "https://github.com/kramer2005/browser-tab-communication/issues"
   },
+  "scripts": {
+    "build:prod": "tsc && webpack --mode production",
+    "build:example": "webpack --mode production --config example/webpack.config.js"
+  },
   "peerDependencies": {
     "uuid": "^9.0.1"
   },

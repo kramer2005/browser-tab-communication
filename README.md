@@ -1,7 +1,7 @@
 # Browser Tab Communication
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/kramer2005/express-async-error-handler/blob/master/LICENSE)
-[![NPM](https://img.shields.io/badge/1.0.0-NPM-CC3838)](https://www.npmjs.com/package/@kramerdev/express-async-error-handler)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/kramer2005/browser-tab-communication/blob/master/LICENSE)
+[![NPM](https://img.shields.io/badge/1.0.0-NPM-CC3838)](https://www.npmjs.com/package/@kramerdev/browser-tab-communication)
 
 ## Table of Contents
 [About](#about)
@@ -14,6 +14,8 @@
 ## About
 
 This project aims to utilize WebRTC for browser tab communication. The main objective is to have real time updates working with multiple tabs and windows.
+
+You can see a live example [here](https://kramerdev.github.io/browser-tab-communication).
 
 ### Communication
 
